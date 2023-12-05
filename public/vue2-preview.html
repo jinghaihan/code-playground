@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/less.js/2.7.3/less.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.8.4/dist/vue2-sfc-loader.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ant-design-vue/1.7.0/antd.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/ant-design-vue/1.7.0/antd.min.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <div id="standalone-app"></div>
+    <script>
+
+      let app = null
+
+      function createApp() {
+        if(app) {
+          app.$destroy()
+          app = null
+        }
+
+        const component = localStorage.getItem('CODE_ENGINE_SOURCE_CODE')
+        const { loadModule, vueVersion } = window['vue2-sfc-loader']
+
+        const options = {
+          moduleCache: {
+            vue: Vue,
+            less: less,
+            'ant-design-vue': antd,
+            myData: {
+              vueVersion,
+            }
+          },
+          getFile(url) {
+            Vue.use(antd)
+            return Promise.resolve(component)
+          },
+          addStyle() { /* unused here */ },
+        }
+
+        loadModule('compile.vue', options)
+        .then(component => {
+          app = new Vue(component).$mount('#standalone-app')
+        })
+      }
+      createApp()
+
+      // window.addEventListener('message', function(event) {
+      //   const { data } = event
+
+      //   switch(data) {
+      //     case 'createApp':
+      //       createApp()
+      //       break
+      //     default:
+      //       break
+      //   }
+      // })
+    </script>
+  </body>
+</html>
